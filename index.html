@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CraftHub - Mods, Shaders & Resource Packs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .mod-card:hover { transform: translateY(-4px); }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+
+  <!-- Header / Navbar -->
+  <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-emerald-500 text-slate-900 font-black p-2 rounded-lg text-xl flex items-center justify-center w-10 h-10">
+          <i class="fa-solid font-bold fa-cube"></i>
+        </div>
+        <span class="text-xl font-bold tracking-wide text-emerald-400">CraftHub</span>
+      </div>
+      
+      <!-- Nav Tabs -->
+      <nav class="hidden md:flex space-x-1 bg-slate-900/60 p-1 rounded-xl border border-slate-700">
+        <button onclick="filterType('all')" id="tab-all" class="tab-btn px-4 py-1.5 rounded-lg text-sm font-medium bg-emerald-500 text-slate-950 shadow">Semua</button>
+        <button onclick="filterType('mod')" id="tab-mod" class="tab-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100">Mods</button>
+        <button onclick="filterType('shader')" id="tab-shader" class="tab-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100">Shaders</button>
+        <button onclick="filterType('resourcepack')" id="tab-resourcepack" class="tab-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100">Resource Packs</button>
+      </nav>
+
+      <button class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-4 py-2 rounded-lg text-sm transition">
+        <i class="fa-solid fa-upload mr-1.5"></i> Unggah Content
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-4 gap-6">
+    
+    <!-- Sidebar Filter -->
+    <aside class="lg:col-span-1 space-y-6 bg-slate-800/50 p-5 rounded-2xl border border-slate-700/60 h-fit">
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Pencarian</label>
+        <div class="relative">
+          <input type="text" id="searchInput" oninput="renderItems()" placeholder="Cari mod, shader..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 pl-9 text-sm focus:outline-none focus:border-emerald-500">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-sm"></i>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Versi Minecraft</label>
+        <select id="versionSelect" onchange="renderItems()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+          <option value="all">Semua Versi</option>
+          <option value="1.20.4">1.20.4</option>
+          <option value="1.20.1">1.20.1</option>
+          <option value="1.16.5">1.16.5</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Mod Loader</label>
+        <div class="space-y-2">
+          <label class="flex items-center text-sm space-x-2 cursor-pointer">
+            <input type="radio" name="loader" value="all" checked onchange="renderItems()" class="accent-emerald-500">
+            <span>Semua Loader</span>
+          </label>
+          <label class="flex items-center text-sm space-x-2 cursor-pointer">
+            <input type="radio" name="loader" value="Fabric" onchange="renderItems()" class="accent-emerald-500">
+            <span>Fabric</span>
+          </label>
+          <label class="flex items-center text-sm space-x-2 cursor-pointer">
+            <input type="radio" name="loader" value="Forge" onchange="renderItems()" class="accent-emerald-500">
+            <span>Forge</span>
+          </label>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Catalog Grid -->
+    <section class="lg:col-span-3">
+      <div id="catalogGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Cards loaded dynamically via JS -->
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const sampleData = [
+      {
+        id: 1,
+        title: "Sodium",
+        type: "mod",
+        category: "Optimization",
+        loader: "Fabric",
+        version: "1.20.4",
+        downloads: "24.5M",
+        desc: "Mod optimisasi mesin render canggih yang meningkatkan FPS secara signifikan.",
+        icon: "⚡",
+        fileUrl: "#"
+      },
+      {
+        id: 2,
+        title: "BSL Shaders",
+        type: "shader",
+        category: "Shaders",
+        loader: "Iris / OptiFine",
+        version: "1.20.4",
+        downloads: "18.2M",
+        desc: "Shader dengan pencahayaan hangat, pemandangan realistis, dan performa tinggi.",
+        icon: "☀️",
+        fileUrl: "#"
+      },
+      {
+        id: 3,
+        title: "Bare Bones",
+        type: "resourcepack",
+        category: "32x32",
+        loader: "Vanilla",
+        version: "1.20.1",
+        downloads: "9.1M",
+        desc: "Resource pack yang membuat tampilan game menjadi seperti trailer resmi Minecraft.",
+        icon: "🎨",
+        fileUrl: "#"
+      },
+      {
+        id: 4,
+        title: "Applied Energistics 2",
+        type: "mod",
+        category: "Tech",
+        loader: "Forge",
+        version: "1.20.1",
+        downloads: "12.8M",
+        desc: "Mod teknologi untuk penyimpanan item otomatis berbasis jaringan energi.",
+        icon: "⚙️",
+        fileUrl: "#"
+      }
+    ];
+
+    let currentType = 'all';
+
+    function filterType(type) {
+      currentType = type;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-emerald-500', 'text-slate-950');
+        btn.classList.add('text-slate-400');
+      });
+      const activeBtn = document.getElementById(`tab-${type}`);
+      activeBtn.classList.add('bg-emerald-500', 'text-slate-950');
+      activeBtn.classList.remove('text-slate-400');
+      renderItems();
+    }
+
+    function renderItems() {
+      const grid = document.getElementById('catalogGrid');
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const version = document.getElementById('versionSelect').value;
+      const loader = document.querySelector('input[name="loader"]:checked').value;
+
+      const filtered = sampleData.filter(item => {
+        const matchesType = currentType === 'all' || item.type === currentType;
+        const matchesSearch = item.title.toLowerCase().includes(search) || item.desc.toLowerCase().includes(search);
+        const matchesVersion = version === 'all' || item.version === version;
+        const matchesLoader = loader === 'all' || item.loader.includes(loader) || item.loader === 'Vanilla';
+        return matchesType && matchesSearch && matchesVersion && matchesLoader;
+      });
+
+      if(filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500">Tidak ada kontent yang sesuai filter.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => `
+        <div class="mod-card bg-slate-800/80 border border-slate-700/80 hover:border-emerald-500/50 transition-all duration-200 rounded-2xl p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-slate-900 border border-slate-700 rounded-xl flex items-center justify-center text-2xl">
+                  ${item.icon}
+                </div>
+                <div>
+                  <h3 class="font-bold text-lg text-slate-100 leading-snug">${item.title}</h3>
+                  <span class="inline-block text-xs text-emerald-400 font-medium">${item.category}</span>
+                </div>
+              </div>
+              <span class="text-xs bg-slate-900 border border-slate-700 px-2 py-1 rounded-md text-slate-400 font-mono">${item.version}</span>
+            </div>
+            <p class="text-slate-400 text-sm mt-3 line-clamp-2">${item.desc}</p>
+          </div>
+
+          <div class="mt-5 pt-4 border-t border-slate-700/60 flex items-center justify-between">
+            <div class="text-xs text-slate-400 flex items-center space-x-3">
+              <span><i class="fa-solid fa-download text-slate-500 mr-1"></i> ${item.downloads}</span>
+              <span><i class="fa-solid fa-puzzle-piece text-slate-500 mr-1"></i> ${item.loader}</span>
+            </div>
+            <button onclick="alert('Mengunduh ${item.title}...')" class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-slate-950 font-semibold px-3 py-1.5 rounded-lg text-xs transition border border-emerald-500/30">
+              Download
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    renderItems();
+  </script>
+</body>
+</html>
